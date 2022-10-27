@@ -9,7 +9,7 @@ class RST_Reader():
         self.variaveis = {"STAB" : ["index", "bus1", "bus2", "bus3", "island"],
                           "DAMP" : ["damp", "bus", "island"],
                           "ILVT" : ["violation", "bus", "island"],
-                          "IHV"  : ["violation", "bus", "island"],
+                          "IHVT" : ["violation", "bus", "island"],
                           "TLVT" : ["violation", "bus", "island"],
                           "THVT" : ["violation", "bus", "island"],
                           "SDVT" : ["violation", "bus", "island"],
@@ -91,12 +91,16 @@ class RST_Reader():
 
                     total[event_names[event-1]] = var
 
+                else:
+                    current_line += 1
+
             cenarios[name] = total
 
         # print(cenarios['bus68']['GL-1'])
 
         matrix = []
         for name in cenarios.keys():
+            # print(name)
             for event in cenarios[name].keys():
                 # print(event)
                 
