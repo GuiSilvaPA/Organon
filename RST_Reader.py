@@ -31,6 +31,7 @@ class RST_Reader():
                         "DAMP_damp", "DAMP_bus", "DAMP_island",
                         # "RCOF",
                         "NDRC_hz", "NDRC_time", "NDRC_inertia",
+                        "NDRB_hz", "NDRB_time",
                         "INRT_s",
                         "PGTM_value0", "PGTM_value1", "PGTM_value4", "PGTM_valuef"]
 
@@ -118,6 +119,8 @@ class RST_Reader():
                                cenarios[name][event]["NDRC0"]["hz"],
                                cenarios[name][event]["NDRC0"]["time"],
                                cenarios[name][event]["NDRC0"]["inertia"],
+                               cenarios[name][event]["NDRB0"]["hz"],
+                               cenarios[name][event]["NDRB0"]["time"],
                                cenarios[name][event]["INRT0"]["s"],
                                cenarios[name][event]["PGTM0"]["value0"],
                                cenarios[name][event]["PGTM0"]["value1"],
@@ -135,4 +138,4 @@ if __name__ == '__main__':
     RST = RST_Reader('', ['bus68', 'bus68_2'])
     cenarios, df = RST.createCenarios()
 
-    # print(df.head())
+    print(df.head())
