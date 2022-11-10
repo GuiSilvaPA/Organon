@@ -186,14 +186,7 @@ class NetworkData():
         # print(self.total_PG_RENEW, self.total_PG_SYNC)
 
         self.total_PMAX_MW_unblock = self.DF_gen[self.DF_gen['BLOCKED'] == 0]['PMAX_MW'].sum() 
-        print('UNBLOCKED:', self.total_PMAX_MW_unblock)
-
-
-
-        # np.asarray([float(i) for i in self.DF_gen['PMAX_MW'].values]) - np.asarray([float(i) for i in self.DF_gen['PG_MW'].values])
-
-        # for idx, i in enumerate(self.reserva_per_gen):
-        #     print(idx+1, i)
+        # print('UNBLOCKED:', self.total_PMAX_MW_unblock)
 
     def blockGen(self, value):
         self.networkInfo()
@@ -203,8 +196,7 @@ class NetworkData():
         sort = self.DF_gen.sort_values(by=["PMAX_MW"])
         sort = sort[sort['TYPE'] != 4]
 
-        removed_gen = 0
-        generators  = []
+        removed_gen, generators = 0, []
 
         for gen in sort['BUS_ID'].values:
 
@@ -223,7 +215,7 @@ class NetworkData():
 
         generators_idx = np.asarray(generators) - 1
 
-        print(threshold, generators, generators_idx)
+        # print(threshold, generators, generators_idx)
 
         self.DF_gen.loc[generators_idx, 'BLOCKED'] = 1 
 
@@ -231,6 +223,56 @@ class NetworkData():
 
         print(sort['BUS_ID'].values)
 
+    def save(self, save_path):
+        
+        # GEN
+        
+        for idx, i in enumerate(range(self.f_gen, self.l_gen+1)):
+            
+            new_line = ''
+            for j in range(len(self.DF_gen.iloc[idx])):
+                if j != len(self.DF_gen.iloc[idx])-1:
+                    
+                    if len(str(self.DF_gen.iloc[idx, j])) < 5:
+                        new_line += f'{str(self.DF_gen.iloc[idx, j]): >6}' + ','
+                    elif len(str(self.DF_gen.iloc[idx, j])) >= 5 and len(str(self.DF_gen.iloc[idx, j])) < 10:
+                        new_line += f'{str(self.DF_gen.iloc[idx, j]): >11}' + ','
+                    else:
+                        new_line += f'{str(self.DF_gen.iloc[idx, j]): >14}' + ','
+                    
+                    
+                    
+                    #new_line += str(self.DF_gen.iloc[idx, j]) + ','
+                else:
+                    new_line += '  ' + str(self.DF_gen.iloc[idx, j]) + '/'
+                
+            self.lines[i] = new_line + ' \n'
+            
+        # LOAD
+            
+        for idx, i in enumerate(range(self.f_load, self.l_load+1)):
+            
+            new_line = ''
+            for j in range(len(self.DF_load.iloc[idx])):
+                if j != len(self.DF_load.iloc[idx])-1:
+                    
+                    if len(str(self.DF_load.iloc[idx, j])) < 5:
+                        new_line += f'{str(self.DF_load.iloc[idx, j]): >6}' + ','
+                    elif len(str(self.DF_load.iloc[idx, j])) >= 5 and len(str(self.DF_load.iloc[idx, j])) < 10:
+                        new_line += f'{str(self.DF_load.iloc[idx, j]): >11}' + ','
+                    else:
+                        new_line += f'{str(self.DF_load.iloc[idx, j]): >14}' + ','
+                    
+                else:
+                    new_line += '  ' + str(self.DF_load.iloc[idx, j]) + '/'
+                
+            self.lines[i] = new_line + ' \n'
+            
+        # SAVE
+            
+        with open(save_path, 'w') as f:
+            for line in self.lines:
+                f.write(line)
 
 
 if __name__ == '__main__':
@@ -252,6 +294,7 @@ if __name__ == '__main__':
     ND.blockGen(1.1)
 
     print(ND.DF_gen['BLOCKED'])
+    ND.save('bb.ntw')
 
     # ND.DF_bus = ND.DF_bus.astype({'BUS_ID': 'int32'})
 
