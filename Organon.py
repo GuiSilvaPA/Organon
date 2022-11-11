@@ -186,7 +186,31 @@ class NetworkData():
         # print(self.total_PG_RENEW, self.total_PG_SYNC)
 
         self.total_PMAX_MW_unblock = self.DF_gen[self.DF_gen['BLOCKED'] == 0]['PMAX_MW'].sum() 
-        # print('UNBLOCKED:', self.total_PMAX_MW_unblock)
+        print('UNBLOCKED:', self.total_PMAX_MW_unblock)
+
+    def changeLoad(self, param, multi, spec=None, arre=2, keepFP=False):
+        
+        
+        ite = spec if spec else [i for i in range(len(self.DF_load))]
+        
+        if keepFP:
+            for i in ite:                    
+                MW, MVAR = float(self.DF_load['PL_MW'][i]), float(self.DF_load['QL_MVAR'][i])                    
+                FP       = MW / np.sqrt(MW**2 + MVAR**2)
+                    
+                new_MW   = MW*multi
+                new_MVAR = np.sqrt((new_MW/FP)**2 - new_MW**2)
+                    
+                self.DF_load['PL_MW'][i]   = round(new_MW,   arre) 
+                self.DF_load['QL_MVAR'][i] = round(new_MVAR, arre)                  
+
+        else:      
+            for i in ite:
+                self.DF_load[param][i] = round(float(self.DF_load.iloc[i][param])*multi, arre)    
+                
+        self.cargaTotal = 0
+        for i in self.DF_load['PL_MW'].values:
+            self.cargaTotal += float(i)
 
     def blockGen(self, value):
         self.networkInfo()
@@ -202,7 +226,7 @@ class NetworkData():
 
             current_gen = self.DF_gen[self.DF_gen['BUS_ID'] == gen]['PMAX_MW'].values[0]
 
-            print(f'{gen:2d} : {current_gen}')
+            # print(f'{gen:2d} : {current_gen}')
 
             teste = self.total_PMAX_MW - removed_gen - current_gen
 
@@ -221,7 +245,7 @@ class NetworkData():
 
         self.networkInfo()
 
-        print(sort['BUS_ID'].values)
+        # print(sort['BUS_ID'].values)
 
     def save(self, save_path):
         
@@ -291,9 +315,9 @@ if __name__ == '__main__':
     # print(ND.DF_gen['BLOCKED'])
     # ND.networkInfo()
 
-    ND.blockGen(1.1)
+    ND.blockGen(0.5)
 
-    print(ND.DF_gen['BLOCKED'])
+    # print(ND.DF_gen['BLOCKED'])
     ND.save('bb.ntw')
 
     # ND.DF_bus = ND.DF_bus.astype({'BUS_ID': 'int32'})
