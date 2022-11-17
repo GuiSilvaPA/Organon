@@ -327,13 +327,16 @@ class NetworkData():
     def changeGenType(self, gen_index, new_type):
         self.DF_gen.loc[gen_index, 'TYPE'] = new_type
 
-    def blockGen(self, value):
+    def blockGen(self, value, swing=None):
         self.networkInfo()
 
         threshold = self.total_PL_MW * value
 
-        sort = self.DF_gen.sort_values(by=["PMAX_MW"])
+        sort = self.DF_gen.sort_values(by=["PMAX_MW"], ascending=False)
         sort = sort[sort['TYPE'] != 4]
+        
+        if swing:
+            sort = sort[sort['BUS_ID'] != swing]
 
         removed_gen, generators = 0, []
 
